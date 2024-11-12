@@ -52,7 +52,7 @@ RUN pip install -r requirements.txt
 # Set display port for headless Chromium
 ENV DISPLAY=:99
 
-# Copy and run your app
+# Copy over and run the app
 WORKDIR /app
 COPY . /app
 
