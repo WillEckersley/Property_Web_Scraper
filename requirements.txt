@@ -1,0 +1,6 @@
+boto3
+polars
+pyarrow
+sqlalchemy
+webdriver_manager
+pandas
