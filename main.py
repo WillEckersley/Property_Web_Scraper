@@ -68,10 +68,9 @@ def lambda_handler(event, context):
     current_date = datetime.now().date()
     formatted_date = current_date.strftime("%Y-%m-%d")
     
-    # Specify output location and filename in s3
+    # Specify output location and filename in s3 and export 
     bucket_name = "property-data-scraping"
-    key = f"{formatted_date}"
-    
+    key = f"date={formatted_date}/{formatted_date}"
     s3.upload_fileobj(buffer, bucket_name, key)
     
     return event, context
