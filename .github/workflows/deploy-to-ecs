@@ -3,6 +3,8 @@
 # of the scraping service, facilitating better maintanance. As the ECS task definition is set
 # to pick up on the 'latest' tag when run, this style of deployment is sufficient for complete CI/CD.
 
+#test comment
+
 name: Push New Docker Image to ECR
 
 on:
