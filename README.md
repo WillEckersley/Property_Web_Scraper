@@ -119,7 +119,7 @@ Finally, the data is aggregated in a gold table. This table also builds out a co
 
 ![gold table](https://github.com/WillEckersley/Property_Web_Scraper/blob/main/readme_images/gold_table.png)
 
-### 5 ...
+### §5 ...
 
 WATCH THIS SPACE FOR FURTHER DEVELOPMENTS COMING SOON! 
 
