@@ -6,13 +6,11 @@
 
 ### §1 Overview:
 
-This project uses an cloud-based serverless webscraping application to extract and clean London rental property data from several internet sites. The scraped data is loaded into a cloud-based datalake where it can be queried using SQL in a lakehouse-style
-layer. This lakehouse layer isued to perform an ELT on the scraped date. Initially it is processed extracted and loaded into a raw 'bronze' table. This 'bronze' data is then transformed within the lakehouse-style environment using a bronze-silver-gold pattern of further cleaning (in the silver table) and aggregation (in the gold layer). The purpose of this is to use 
-the gold table as a data source for a basic ML model which can be used to predict price changes across areas and property sizes.
+This project uses a cloud-based serverless web scraping application to extract and clean London rental property data from several internet sites. The scraped data is loaded into a cloud-based data lake where it can be queried using SQL in a lakehouse-style layer. This lakehouse layer is used to perform an ELT on the scraped data. Initially, it is processed, extracted, and loaded into a raw 'bronze' table. This 'bronze' data is then transformed within the lakehouse-style environment using a bronze-silver-gold pattern of further cleaning (in the silver table) and aggregation (in the gold layer). The purpose of this is to use the gold table as a data source for a basic ML model, which can be used to predict price changes across areas and property sizes.
 
-The purpose of this project was to develop new skills that bridge Data Engineering, DevOps and MLOps workflows with a view to demonstrating new capability with MLOps. For instance I learned webscraping, CI/CD principles and ML pipeline principles. To that extent, the 
-project continues to be a work in progress as the gold table has not been integrated into the model. Future developements will centre around building out the ML model itself, CI/CD features for accurate model deployment as well as the introduction of monitoring systems to ensure proper maintence of the entire ML pipeline - WATCH THIS SPACE!
-Nonetheless, for now the ETL + ELT pipelines (and associated CI/CD) underlaying the model are fully deployed and running on a daily loaded schedule. As such I have chosen to show off this part of the overall pipeline now as it represnts signficant progress towards the finished project.
+The purpose of this project was to develop new skills that bridge Data Engineering, DevOps, and MLOps workflows with a view to demonstrating new capabilities with MLOps. For instance, I learned web scraping, CI/CD principles, and ML pipeline principles. To that extent, the project continues to be a work in progress as the gold table has not been integrated into the model. Future developments will center around building out the ML model itself, CI/CD features for accurate model deployment, as well as the introduction of monitoring systems to ensure proper maintenance of the entire ML pipeline - WATCH THIS SPACE!
+
+Nonetheless, for now, the ETL + ELT pipelines (and associated CI/CD) underlying the model are fully deployed and running on a daily loaded schedule. As such, I have chosen to show off this part of the overall pipeline now, as it represents significant progress towards the finished project.
 
 ### §2 Pipeline Architechture:
 
