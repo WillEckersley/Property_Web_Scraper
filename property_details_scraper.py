@@ -145,22 +145,28 @@ class DataScraper:
                 else:
                     print("Element is not displayed.")
 
-        filtered_properties_list = [item for item in property_list if not item[0].startswith("New properties")]
+       # Filter outer list to contain only lists with property data
+        filtered_properties_list = [item for item in property_list if not item[0].startswith("New properties") and len(item) == 4]
+
+        # Specify a list of items to remove from zeroth inx of property data lists
         remove_items = ["Zero Deposit Scheme", "Recently let", "Recommended property", "Recently reduced in price"]
 
+        # Remove erroneous elements from list.
         for item in filtered_properties_list:
             if item[0] in remove_items:
                 item.pop(0)
+            else:
+                continue
 
-        df_dict = {"address": [], "cost_pcm": [], "num_beds": []}
+        # Create a dictionary for loading data into dataframe and append relevant items from inner lists to appropriate keys.
+        df_dict = {"address" : [], "cost_pcm" : [], "num_beds" : []}
+
+        print(len([item for item in filtered_properties_list if len(item) > 3]))
 
         for item in filtered_properties_list:
             df_dict["address"].append(item[0])
             df_dict["cost_pcm"].append(item[1])
-            if len(item) > 2:
-                df_dict["num_beds"].append(item[2])
-            else:
-                df_dict["num_beds"].append(None)
+            df_dict["num_beds"].append(item[2])
 
         return df_dict
 

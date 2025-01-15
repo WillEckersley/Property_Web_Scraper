@@ -148,16 +148,18 @@ class DataCleaner:
             # Extract the numeric part from cost_pcm and alias the column
             (
                 pl.col("cost_pcm")
-                .str.extract(r"£([\d,]+)", 1)
+                .str.split(" ")
+                .list.get(2, null_on_oob=True)
+                .str.replace(r"£|pcm", "")
+                .str.split(".")
+                .list.get(0)
                 .str.replace(",", "")
-                .cast(pl.Int64)
-                .alias("cost_pcm")
+                .cast(int)
             ),
             
             # Extract number of beds from num_beds column using refined regex
             (
                 pl.col("num_beds")
-                .str.extract(r"(\d+)\s*(bed|bedroom|bedrooms)", 1)
                 .cast(pl.Int32)
                 .alias("num_beds")
             ),
