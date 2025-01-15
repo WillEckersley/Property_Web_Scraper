@@ -6,23 +6,21 @@
 
 ### §1 Overview:
 
-This project uses an cloud-hosted (AWS) webscraping application to extract and clean London rental property data from several internet sites. The data is loaded into a cloud-based datalake (AWS) where it can be queried using a SQL in a lakehouse-style
-layer where it is stored intitially in a raw 'bronze' table. This 'bronze' data is then ELT'd within the lakehouse envirnent using a bronze-silver-gold pattern of further cleaning (in the silver table) and aggregation (in the gold layer). The purpose of this is to use 
-the gold table as a data source for a basic ML model which can be used to predict price changes across areas and property sizes. 
+This project uses a cloud-based serverless web scraping application to extract and clean London rental property data from several internet sites. The scraped data is loaded into a cloud-based data lake where it can be queried using SQL in a lakehouse-style layer. This lakehouse layer is used to perform an ELT on the scraped data. Initially, it is processed, extracted, and loaded into a raw 'bronze' table. This 'bronze' data is then transformed within the lakehouse-style environment using a bronze-silver-gold pattern of further cleaning (in the silver table) and aggregation (in the gold layer). The purpose of this is to use the gold table as a data source for a basic ML model, which can be used to predict price changes across areas and property sizes.
 
-The purpose of this project was to develop new skills that bridge Data Engineering, DevOps and MLOps workflows with a view to demonstrating new capability with MLOps. For instance I learned webscraping, CI/CD principles and ML pipeline principles. To that extent, the 
-project continues to be a work in progress. Future developements will centre around building out the ML model itself, CI/CD features for accurate model deployment as well as the introduction of monitoring systems to ensure proper maintence of the entire ML pipeline.
-Nonetheless, at this stage the entire ML data pipeline is functional and ready for refinement and ultimately deployment into a model. 
+The purpose of this project was to develop new skills that bridge Data Engineering, DevOps, and MLOps workflows with a view to demonstrating new capabilities with MLOps. For instance, I learned web scraping, CI/CD principles, and ML pipeline principles. To that extent, the project continues to be a work in progress as the gold table has not been integrated into the model. Future developments will center around building out the ML model itself, CI/CD features for accurate model deployment, as well as the introduction of monitoring systems to ensure proper maintenance of the entire ML pipeline - WATCH THIS SPACE!
+
+Nonetheless, for now, the ETL + ELT pipelines (and associated CI/CD) underlying the model are fully deployed and running on a daily loaded schedule. As such, I have chosen to show off this part of the overall pipeline now, as it represents significant progress towards the finished project.
 
 ### §2 Pipeline Architechture:
 
-See below for the basic architechture of the pipeline:
+See below for the basic architechture of the data pipeline:
 
 ![pipeline architechure](https://github.com/WillEckersley/Property_Web_Scraper/blob/main/readme_images/property_ml_pipeline.svg)
 
 ### §3 ETL - Phase One:
 
-The ETL portion of the data pipeline utilises an object-oriented application design pattern to extract property data from the internet using Selenium and load it into the AWS S3 datalake in parquet format. Between these steps Polars is used to perform fast basic 
+The ETL portion of the data pipeline utilises an object-oriented application design pattern to extract property data from the internet using Selenium and load it into the AWS S3 datalake in parquet format. Parquet was chosen for its efficiency and compatibility with a range of advanced systems and software. Between these steps Polars is used to perform basic basic 
 formatting of the data. The application is hosted on AWS. There it is stored as Dockerised application in AWS ECR and defined as a task using ECS Fargate. It is scheduled to be run on a daily basis using EventBridge Scheduler. 
 
 #### 3.1 Extraction:
@@ -32,8 +30,7 @@ extract the relevant raw data from a range of different sources online. This raw
 
 #### 3.2 Transformation:
 
-The raw scraped data is given a first parse in the df_cleaner.py file. This file leverages Polars for rapid data manipulation and effective formatting. Cleaning functions objectified in a 'DataCleaner' class analogous to the scraping functions in DataCleaner individually 
-handle the return of the dataframes generated from the cleaning file. 
+The raw scraped data is given a first parse in the df_cleaner.py file. This file leverages Polars for rapid data manipulation and effective formatting. Cleaning functions objectified in a 'DataCleaner' class analogous to the scraping functions in DataCleaner individually handle the return of the dataframes generated from the cleaning file. 
 
 #### 3.4 Loading: 
 
@@ -45,7 +42,7 @@ property-data-scraping/date={ingestion_date}/{ingestion_date}
 
 ![s3](https://github.com/WillEckersley/Property_Web_Scraper/blob/main/readme_images/S3.png)
 
-This folder structure facilitates high levels of data efficiency and availablity through AWS Athena paritition projection which is capable of auto-partitioning data based on folders named with a date/time structure (see more below).  
+This folder structure facilitates high levels of data availability through the use of partition projection in the AWS Athena lakehouse-style platform. This feature allows auto-partitioning of data based on folders named with a date/time structure (see more below).  
 
 ### §4 ELT - Phase Two:
 
@@ -53,8 +50,7 @@ Although the data is successfully loaded into the S3 datalake at the completion 
 
 #### 4.1 Extraction and Loading:
 
-In this step data is extracted from the data lake into a bronze table 'rental_property_data_scraping_bronze' in the AWS Athena lakehouse-style platform using a CREATE TABLE statement based partitially off a Glue Crawler table which was used to build the table on the 
-first parse:  
+In this step data is extracted from the data lake into a bronze table 'rental_property_data_scraping_bronze' in the AWS Athena using a CREATE TABLE statement based partitially off a Glue Crawler table which was used to build the table on the first parse:  
 ```
 CREATE EXTERNAL TABLE `rental_property_data_scraping_bronze`(
   `update_date` timestamp, 
@@ -87,7 +83,7 @@ TBLPROPERTIES (
   'transient_lastDdlTime'='1732988748'
 );
 ```
-Here, as mentioned above, in the TBLPROPERTIES (table properties) partition projection on the ingestion date property is used. This ensures that data is loaded into the bronze table automatically without the need to handle manual partition addition using either of the
+Here, as mentioned above, in the TBLPROPERTIES (table properties) partition projection on the 'date' property is used for efficient extraction and loading. This removes the need to run either of the 
 below commands: 
 ```
 ALTER TABLE ADD IF NOT EXISTS PARTITION ({partition_name})
@@ -96,7 +92,7 @@ ALTER TABLE ADD IF NOT EXISTS PARTITION ({partition_name})
 
 MSCK REPAIR TABLE {table_name}
 ```
-Either of these methods must be used where an alternative (auto-)parititioning method is not employed. This effectively allows the data to be auto-loaded while also preserving useful data (ingestion date).
+Either of these methods must be used where an alternative (auto-)parititioning method is not employed. This effectively allows the data to be auto-loaded while also preserving useful information in the source table (ingestion date).
 
 #### 4.2 Transformation:
 
@@ -121,7 +117,9 @@ Finally, the data is aggregated in a gold table. This table also builds out a co
 
 ![gold table](https://github.com/WillEckersley/Property_Web_Scraper/blob/main/readme_images/gold_table.png)
 
+### §5 ...
 
+WATCH THIS SPACE FOR FURTHER DEVELOPMENTS COMING SOON! 
 
 
 
