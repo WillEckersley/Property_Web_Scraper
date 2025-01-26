@@ -22,7 +22,7 @@ class DataCleaner:
                 .alias("cost_sterling"),
 
                 # Cast num_beds and num_baths columns
-                pl.col("num_beds").cast(pl.Int32),
+                pl.col("num_beds").cast(pl.Float32),
                 pl.col("num_baths").cast(pl.Int32),
 
                 # Create area column using generator
@@ -100,6 +100,7 @@ class DataCleaner:
                     pl.lit(text_number_map[number])
                 )
                 .otherwise(pl.col("num_beds")) 
+                .cast(pl.Float32)
                 .alias("num_beds")
             )
 
@@ -160,7 +161,7 @@ class DataCleaner:
             # Extract number of beds from num_beds column using refined regex
             (
                 pl.col("num_beds")
-                .cast(pl.Int32)
+                .cast(pl.Float32)
                 .alias("num_beds")
             ),
             
